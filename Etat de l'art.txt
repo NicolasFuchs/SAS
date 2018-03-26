@@ -1,0 +1,44 @@
+Applications testée:
+
+Questions à se poser:
+
+Plateforme?
+Volontaire?
+Possible de paramètres par rapport à l’âge?
+Essayer de comprendre l’utilisation pour lequel c’est prévu
+Possibilités de blocage?
+Interdiction ou Redonner le contrôle?
+Difficulté de prise en main (subjectif) de 1 à 5 (5 étant le plus difficile)s
+
+Self Control:
+
+Blocage total de sites web pour un temps de 15 minutes à 1 jour.
+Le logiciel propose des sites web de base à bloquer. (Réseau sociaux etc.)
+
+
+Principe:
+L’utilisateur blackliste des sites. Il lance le blocage du temps qu’il a besoin. Et une fois que le temps est écoulé les sites sont débloqués et il peut retirer des éléments de la liste.
+Filtrage explicite de site web pour une durée déterminée. 
+Il est également possible de bloquer l’application mail
+
+
+Application simple. Utile pour des gens qui sont volontaires pour se gérer. 
+C’est facile à mettre en place. 
+
+MAC OS
+
+Ce qui serait bien, c’est de pouvoir paramètrer la liste des sites depuis une page web (Genre le parent pour l’enfant) et que la machine de l’enfant soit touchée. 
+
+
+Contrôle parental mac OS:
+
+Sur le même ordi que le parent
+Bloquer les sites web explicitement
+Uniquement sur mac os
+Bloquer des heures et des durées
+Bloquer des apps
+Limiter les stores
+Limiter les sites web pour adultes (Essayer de limiter —> stipule que c’est pas possible entièrement)
+
+Basé sur les interdictions et non pas sur redonner le contrôle
+Non volontaire
