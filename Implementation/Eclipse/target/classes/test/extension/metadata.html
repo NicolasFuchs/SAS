@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="ISO-8859-1">
+<meta name=description content="You're a winner">
+<title>Metadata page</title>
+<script>
+function displayMetadata() {
+	  var m = document.getElementsByTagName('meta');
+	  //alert(m.length);
+	  for (var i = 0; i < m.length; m++) {
+		  //alert(m[i].content);
+		  //alert(m[i].getAttribute("content"));
+		  alert(document.head.querySelector("[name=description]").content);
+	  }
+}
+</script>
+</head>
+<body>
+    <button onclick=displayMetadata()>Click to get metadata</button>
+</body>
+</html>
