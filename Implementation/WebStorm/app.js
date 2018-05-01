@@ -5,11 +5,10 @@ var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var concat = require('concat-files');
+var extfs = require('extfs');
 var fs = require('fs');
 var os = require('os');
 
-var index = require('./routes/index');
-var users = require('./routes/users');
 var sniff = require('./routes/sniff');
 
 var app = express();
@@ -26,8 +25,9 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.use('/', index);
-app.use('/users', users);
+app.get("/active", function(req, res) {
+    res.send(crtprocess);
+});
 app.use('/sniff', sniff);
 
 // catch 404 and forward to error handler
@@ -48,21 +48,42 @@ app.use(function(err, req, res, next) {
   res.render('error');
 });
 
+// get the active application
+var crtprocess = "";
+var aw = require('active-win');
+setInterval(function() {
+    crtprocess = aw.sync().owner.name;
+    console.log(aw.sync());
+}, 3000);
+
 // file merging process
-//setInterval(mergeLogs, 600000);     //600000 ms correspond à 10 min
-setInterval(mergeLogs, 60000);
-function mergeLogs() {
+setInterval(mergeLogs, 60000);  //setInterval(mergeLogs, 600000);     //600000 ms correspond à 10 min
+function mergeLogs(callback) {
     console.log("Merging process");
-    var date = new Date();
+    var blockingDate = new Date();
+    if (blockingDate.getHours() === 23 && blockingDate.getMinutes() > 55) {     //Merge lancé par le changement de date et non le setInterval
+        return;
+    }
     var source1 = os.userInfo().username + "_extension";
     var source2 = os.userInfo().username + "_processes";
-    var destination = os.userInfo().username + "_log_" + date.getUTCDate() + "." + (date.getUTCMonth() + 1) + "." + date.getUTCFullYear();
+    var source;
+    if (!extfs.isEmptySync(source1)) {
+        source = source1;
+    } else if (!extfs.isEmptySync(source2)) {
+        source = source2;
+    } else {
+        return;
+    }
+    var date = fs.readFileSync(source).toString().split("|")[0];
+
+    var destination = os.userInfo().username + "_log_" + date;
     if (fs.existsSync(destination)) {
         concat([source1, source2, destination], destination, function(err) {
             if (err) throw err;
             console.log('Merge done');
             fs.writeFileSync(source1, '');
             //fs.writeFileSync(source2, '');
+            if (callback) callback();
         });
     } else {
         concat([source1, source2], destination, function(err) {
@@ -70,8 +91,9 @@ function mergeLogs() {
             console.log('Merge done');
             fs.writeFileSync(source1, '');
             //fs.writeFileSync(source2, '');
+            if (callback) callback();
         });
     }
 }
-
+module.exports.mergeLogs = mergeLogs;
 module.exports = app;
