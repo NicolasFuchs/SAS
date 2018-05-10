@@ -1,0 +1,10 @@
+Starting Nmap 7.70 ( https://nmap.org ) at 2018-05-08 18:21 Europe de l?Ouest (heure d?été)
+Nmap scan report for internetbox.home (192.168.1.1)
+Host is up (0.0029s latency).
+MAC Address: 7C:B7:33:9E:D7:00 (Askey Computer)
+Nmap scan report for pc-58.home (192.168.1.2)
+Host is up (0.060s latency).
+MAC Address: 7C:B7:33:9E:D7:06 (Askey Computer)
+Nmap scan report for nico-hp.home (192.168.1.116)
+Host is up.
+Nmap done: 256 IP addresses (3 hosts up) scanned in 26.30 seconds

@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.text.Font?>
+
+<BorderPane fx:id="discoveryUsersBorderpane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1" fx:controller="sample.discoveryUsersList">
+   <top>
+      <Label prefHeight="64.0" prefWidth="456.0" text="Superviser un utilisateur" textAlignment="CENTER" BorderPane.alignment="CENTER">
+         <font>
+            <Font size="43.0" />
+         </font>
+         <padding>
+            <Insets top="10.0" />
+         </padding></Label>
+   </top>
+   <center>
+      <TableView fx:id="discoveryUsersList" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="250.0" prefWidth="500.0" BorderPane.alignment="CENTER" />
+   </center>
+   <bottom>
+      <GridPane alignment="CENTER" prefWidth="600.0" BorderPane.alignment="CENTER">
+        <columnConstraints>
+          <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="10.0" prefWidth="100.0" />
+          <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="10.0" prefWidth="100.0" />
+        </columnConstraints>
+        <rowConstraints>
+          <RowConstraints maxHeight="-Infinity" minHeight="10.0" prefHeight="30.0" valignment="CENTER" />
+        </rowConstraints>
+         <children>
+            <Button mnemonicParsing="false" onAction="#supervise" text="Superviser" />
+            <Button mnemonicParsing="false" onAction="#cancel" text="Annuler" GridPane.columnIndex="1" />
+         </children>
+         <padding>
+            <Insets bottom="10.0" />
+         </padding>
+      </GridPane>
+   </bottom>
+</BorderPane>
