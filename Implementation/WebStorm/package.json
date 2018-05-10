@@ -14,10 +14,13 @@
     "express": "~4.15.5",
     "extfs": "0.0.7",
     "jade": "~1.11.0",
+    "local-ip": "^2.0.0",
+    "moment-timezone": "^0.5.16",
     "morgan": "~1.9.0",
     "process-list": "^1.2.2",
     "python": "0.0.4",
     "rebuild": "^0.1.2",
-    "serve-favicon": "~2.4.5"
+    "serve-favicon": "~2.4.5",
+    "url-exists": "^1.0.3"
   }
 }

@@ -31,16 +31,18 @@ chrome.tabs.onActivated.addListener(function(activeInfo) {
     });
 });
 
+// Envoie la donnée de navigation au serveur local
 function sendTimedURL() {
 	var http = new XMLHttpRequest();
-    var day = startTime.getUTCDate();
-    var month = startTime.getUTCMonth() + 1;
-    var date = startTime.getUTCFullYear() + "." + ((month < 10)?"0":"") + month + "." + ((day < 10)?"0":"") + day;
+    var day = startTime.getDate();
+    var month = startTime.getMonth() + 1;
+    var date = startTime.getFullYear() + "." + ((month < 10)?"0":"") + month + "." + ((day < 10)?"0":"") + day;
     var time = (endTime.getTime() - startTime.getTime()) / 1000;
     var TimedUrl = {date:date, url:previousURL, start:startTime, end:endTime, time:time, description:previousDescription};
     http.open("POST", "http://localhost:" + port + "/sniff", false); // false for synchronous request
     http.setRequestHeader("Content-type", "application/json");
     http.send(JSON.stringify(TimedUrl));
+    //alert("startTime : " + startTime + " endTime : " + endTime);
 }
 
 // Check si le navigateur est toujours actif
@@ -57,8 +59,19 @@ setInterval(function() {
         hasBrowserFocusOut = false;
         startTime = new Date();
     }
-}, 3000);
+}, 1000);
 
+// Check si l'heure est 11h59
+setInterval(function() {
+    var date = new Date();
+    if (!hasBrowserFocusOut && date.getHours() === 23 && date.getMinutes() === 59 && date.getSeconds() === 59) {
+        endTime = new Date(date.getTime()+1000);
+        sendTimedURL();
+        startTime = endTime;
+    }
+}, 1000);
+
+// Récupère les métadonnées de l'onglet actuel
 function getMetaContent() {
     var code =  'var meta = document.querySelector("meta[name=\'description\']");' +
                 'if (meta) meta = meta.getAttribute("content");' +
@@ -72,6 +85,6 @@ function getMetaContent() {
         if (!results) {
             return;
         }
-        previousDescription = results[0].description;
+        previousDescription = results[0].description.replace(/\n|\r/g, "").trim();
     });
 }
