@@ -39,10 +39,13 @@ public class MyStat implements Initializable{
     private BorderPane tabBorderPane;
     @FXML
     private Pane centerPane;
-
+    @FXML
+    private ToggleButton activityToggleButton;
+    @FXML
+    private ToggleButton categoryToggleButton;
     @FXML
     private ImageView usersImageView;
-
+    ToggleGroup group;
     // These 3 variables indicates if the graphics are displayed
     private boolean gamesDisplayed;
     private boolean networkDisplayed;
@@ -59,6 +62,7 @@ public class MyStat implements Initializable{
 
     // Contains users infos to display
     ArrayList<Bar>infosBarChart;
+    ArrayList<Sector> infosForPieChart;
 
     @Override
     public void initialize(URL url, ResourceBundle rb){
@@ -70,18 +74,49 @@ public class MyStat implements Initializable{
        // tabBorderPane.setRight(dailyBarChart);
         jsonReader = new JsonReader();
         infosBarChart = jsonReader.readForBarChart();
+        infosForPieChart = jsonReader.readForPieChart();
         File file = new File("/Users/Gregory/Desktop/hes-so/3 eme/Projet de semestre/PS2/SAS/Implementation/SAS_user/userProfile.JPG");
         Image image = new Image(file.toURI().toString());
-        displayPieChart();
         centerPane.getChildren().addAll(dailyBarChart);
         userNoteTextArea.setText("Les notes concernant l'utilisateur");
         usersImageView.setImage(image);
+        group = new ToggleGroup();
+        activityToggleButton.setToggleGroup(group);
+        activityToggleButton.setSelected(true);
+        categoryToggleButton.setToggleGroup(group);
         handleSelectedCheckBox();
+        handleSelectedToggle();
+    }
+    @FXML
+    public void handleSelectedToggle() {
+        boolean categoryToggle = categoryToggleButton.isSelected();
+        boolean activityToggle = activityToggleButton.isSelected();
+        if(categoryToggle){
+            displayCumulateTimePieChart();
+        }else if(activityToggle){
+            displayPieChart();
+        }
+    }
+
+    private void displayCumulateTimePieChart() {
+        double networkTimes = 0;
+        double gamesTimes = 0;
+        Sector sector;
+        ObservableList<PieChart.Data> pieChartData = FXCollections.observableArrayList();
+        for (int i = 0; i<infosForPieChart.size();i++){
+            sector = infosForPieChart.get(i);
+            if(sector.getCategory().equals("games")){
+                gamesTimes+=sector.getTime();
+            }else{
+                networkTimes+=sector.getTime();
+            }
+        }
+        pieChartData.add(new PieChart.Data("Réseaux sociaux",networkTimes));
+        pieChartData.add(new PieChart.Data("Jeux vidéos",gamesTimes));
+        dailyPieChart.setData(pieChartData);
     }
 
     public void displayPieChart(){
-
-        ArrayList<Sector> infosForPieChart = jsonReader.readForPieChart();
         ObservableList<PieChart.Data> pieChartData = FXCollections.observableArrayList();
         for (int i = 0; i<infosForPieChart.size();i++){
             pieChartData.add(new PieChart.Data(infosForPieChart.get(i).getName(),infosForPieChart.get(i).getTime()));
@@ -100,7 +135,6 @@ public class MyStat implements Initializable{
                 cumulateGamesTime += time;
             }
         }
-
         gamesDisplayed = true;
         dailyBarChart.getData().addAll(series1);
     }

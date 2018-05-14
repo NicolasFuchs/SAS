@@ -16,8 +16,9 @@ import org.json.simple.parser.ParseException;
 public class JsonReader {
     private static final String filePathPie = "/Users/Gregory/Desktop/hes-so/3 eme/Projet de semestre/PS2/SAS/Implementation/SAS_user/jsonSamplePie";
     private static final String filePathBar = "/Users/Gregory/Desktop/hes-so/3 eme/Projet de semestre/PS2/SAS/Implementation/SAS_user/jsonSampleBar";
-
+   // private ServerConnection serverConnection;
     public JsonReader(){
+        //serverConnection = new ServerConnection("url");
     }
 
     private ArrayList<Sector> readByCategory(JSONArray category, String date, String categoryName){

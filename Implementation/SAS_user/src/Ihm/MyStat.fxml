@@ -17,7 +17,7 @@
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.text.Font?>
 
-<ScrollPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="900.0" prefWidth="1500.0" xmlns="http://javafx.com/javafx/9.0.4" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Ihm.MyStat">
+<ScrollPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="900.0" prefWidth="1500.0" xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Ihm.MyStat">
     <content>
         <BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="900.0" prefWidth="1500.0" xmlns="http://javafx.com/javafx/9.0.4" xmlns:fx="http://javafx.com/fxml/1">
            <center>
@@ -35,10 +35,11 @@
                              <top>
                                 <AnchorPane minHeight="-Infinity" minWidth="-Infinity" prefHeight="50.0" prefWidth="1200.0" BorderPane.alignment="CENTER_RIGHT">
                                    <children>
-                                      <ToggleButton layoutX="46.0" layoutY="12.0" mnemonicParsing="false" text="ToggleButton" />
+                                      <ToggleButton fx:id="categoryToggleButton" layoutX="46.0" layoutY="12.0" mnemonicParsing="false" onAction="#handleSelectedToggle" text="Catégories" />
                                       <CheckBox fx:id="displayGamesCheckbox" layoutX="941.0" layoutY="18.0" mnemonicParsing="false" onAction="#handleSelectedCheckBox" text="Jeux vidéos" />
                                       <CheckBox fx:id="displayNetworksCheckbox" layoutX="798.0" layoutY="18.0" mnemonicParsing="false" onAction="#handleSelectedCheckBox" text="Réseaux sociaux" />
                                       <CheckBox fx:id="displayCumulateTimeCheckbox" layoutX="1067.0" layoutY="18.0" mnemonicParsing="false" onAction="#handleSelectedCheckBox" text="Temps cumulé" />
+                                    <ToggleButton fx:id="activityToggleButton" layoutX="131.0" layoutY="12.0" mnemonicParsing="false" onAction="#handleSelectedToggle" selected="true" text="Activités" />
                                    </children>
                                    <BorderPane.margin>
                                       <Insets right="100.0" />
