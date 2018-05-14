@@ -1,17 +1,24 @@
 package sample;
 
+import com.sun.xml.internal.ws.policy.privateutil.PolicyUtils;
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.geometry.Insets;
+import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
+import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.image.ImageView;
+import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.GridPane;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.util.Pair;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -19,17 +26,14 @@ import java.io.InputStreamReader;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.List;
-import java.util.ResourceBundle;
+import java.util.*;
 
 public class discoveryUsersList implements Initializable {
 
     private static FXMLLoader fxmlLoader;
     private static Stage stageMain;
     private final int port = 3000;
-
+    private String password;
     @FXML private TableView<HostToDisplay> discoveryUsersList;
     @FXML private Button superviseButton;
     @FXML private Button cancelButton;
@@ -38,7 +42,9 @@ public class discoveryUsersList implements Initializable {
     public void initialize(URL url, ResourceBundle rb) {
         List<Host> hosts = null;
         try {
-            hosts = getMachines(getIPandMask());
+            NetworkInfo n = getIPandMask();
+            System.out.println(n.ip+" "+n.subnetMask);
+            hosts = getMachines(n);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -94,15 +100,52 @@ public class discoveryUsersList implements Initializable {
                 String nin = networkInterface.getDisplayName();
                 String addr = addresses.nextElement().getHostAddress();
                 if (!nin.contains("Adapter") && !nin.contains("Virtual") && (addr.contains("160.98.") ||addr.contains("192.168.") || addr.contains("172.16.") || addr.contains("10."))) {
-                    return new NetworkInfo(addr, networkInterface.getInterfaceAddresses().get(0).getNetworkPrefixLength());
+                    if (networkInterface.getInterfaceAddresses().size() == 1) return new NetworkInfo(addr, networkInterface.getInterfaceAddresses().get(0).getNetworkPrefixLength());
+                    else return new NetworkInfo(addr, networkInterface.getInterfaceAddresses().get(1).getNetworkPrefixLength());
                 }
             }
         }
         return null;
     }
+    private void displayPasswordDialog(){
+        Dialog<Pair<String, String>> dialog = new Dialog<>();
+        dialog.setTitle("Mot de passe administrateur");
+        ButtonType loginButtonType = new ButtonType("Login", ButtonBar.ButtonData.OK_DONE);
+        dialog.getDialogPane().getButtonTypes().addAll(loginButtonType, ButtonType.CANCEL);
+        GridPane grid = new GridPane();
+        grid.setHgap(10);
+        grid.setVgap(10);
+        grid.setPadding(new Insets(20, 150, 10, 10));
+        PasswordField password = new PasswordField();
+        password.setPromptText("Password");
+        grid.add(new Label("Password:"), 0, 1);
+        grid.add(password, 1, 1);
+        Node loginButton = dialog.getDialogPane().lookupButton(loginButtonType);
+        loginButton.setDisable(true);
+        password.textProperty().addListener((observable, oldValue, newValue) -> {
+            loginButton.setDisable(newValue.trim().isEmpty());
+        });
+        dialog.getDialogPane().setContent(grid);
+
+        Platform.runLater(() -> password.requestFocus());
+
+        dialog.setResultConverter(dialogButton -> {
+            if (dialogButton == loginButtonType) {
+                return new Pair<>(password.getText(), password.getText());
+            }
+            return null;
+        });
+
+        Optional<Pair<String, String>> result = dialog.showAndWait();
+
+        result.ifPresent(usernamePassword -> {
+            this.password = usernamePassword.getValue();
+        });
+    }
 
     private List<Host> getMachines(NetworkInfo networkInfo) throws Exception {
-        String command = "nmap -sP " + networkInfo.ip + "/" + networkInfo.subnetMask;
+        displayPasswordDialog();
+        String[] command ={"/bin/bash","-c","echo "+password+" | sudo -S nmap -sP " + networkInfo.ip + "/" + networkInfo.subnetMask};
         Process p = Runtime.getRuntime().exec(command);
         p.waitFor();
 
@@ -111,7 +154,10 @@ public class discoveryUsersList implements Initializable {
         InputStream is = new ByteArrayInputStream(Charset.forName("UTF-8").encode(myString).array());
 
         BufferedReader reader = new BufferedReader(new InputStreamReader(is));*/
-        String line = ""; reader.readLine();
+        String line = "";
+        if(System.getProperty("os.name").equals("Mac OS X")){ // do a readline because there is an additionnal line with mac os
+            line = reader.readLine();
+        }
         line = reader.readLine();
         String[] splittedGateway = line.split("\\s+")[4].split("\\.");
         String suffix = "." + splittedGateway[splittedGateway.length-1];
