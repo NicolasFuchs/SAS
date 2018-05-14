@@ -7,7 +7,7 @@ var bodyParser = require('body-parser');
 var sniff = require('./routes/sniff');
 var processWatcher = require('./routes/processWatcher');
 var supervise = require('./routes/supervise');
-var cp = require('child_process');
+var charts = require('./routes/charts');
 
 var app = express();
 
@@ -25,8 +25,23 @@ app.get("/active", function(req, res) {
     res.send(processWatcher.getCrtProcess());
 });
 
+app.use("/charts", charts);
 app.use("/supervise", supervise);
 app.use('/sniff', sniff);
+
+
+
+var request = require('request');
+var options = {
+    url: 'http://localhost:3000/charts/pieChart',
+    method: 'GET',
+    qs: {user:'Nicolas'}
+};
+request(options, function(error, response, body) {
+    console.log('request sent!');
+});
+
+
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
