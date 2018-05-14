@@ -6,7 +6,7 @@ var concat = require('concat-files');
 var moment = require('moment-timezone');
 moment().tz("Europe/Paris");
 
-function mergeLogs(callback) {
+function mergeLogs() {
     console.log("Merging process");
     var blockingDate = moment(new Date());
     if (blockingDate.hours() === 23 && blockingDate.minutes() > 55) {
@@ -37,7 +37,6 @@ function mergeLogs(callback) {
         console.log('Merge done');
         fs.writeFileSync(source1, '');
         fs.writeFileSync(source2, '');
-        if (callback) callback();
     });
 }
 module.exports.mergeLogs = mergeLogs;
