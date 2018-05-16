@@ -1,6 +1,7 @@
 package sample;
 
-import com.sun.xml.internal.ws.policy.privateutil.PolicyUtils;
+import com.oracle.javafx.jmx.json.JSONException;
+import javafx.animation.Transition;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -8,22 +9,25 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
+import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.image.ImageView;
-import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
-import javafx.stage.Modality;
+import javafx.scene.layout.StackPane;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Arc;
+import javafx.scene.shape.ArcType;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 import javafx.util.Pair;
+import org.json.simple.parser.ParseException;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
-
 import java.io.*;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
@@ -41,7 +45,8 @@ public class discoveryUsersList implements Initializable {
     @FXML private TableView<HostToDisplay> discoveryUsersList;
     @FXML private Button superviseButton;
     @FXML private Button cancelButton;
-
+    @FXML
+    private BorderPane discoveryUsersBorderpane;
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         getSupervisedUserFile();
@@ -64,25 +69,28 @@ public class discoveryUsersList implements Initializable {
             }
         } catch (FileNotFoundException e) {
             System.out.println("Le fichier n'existe pas encore");
-        } catch (ParseException e) {
-            e.printStackTrace();
         } catch (IOException e) {
             System.out.println("Le fichier n'existe pas encore");
+        } catch (JSONException e) {
+            e.printStackTrace();
+        } catch (ParseException e) {
+            e.printStackTrace();
         }
     }
     private void fillTableHostsToDiscover(){
-        /*try {
+        List<Host> hosts = null;
+       /* try {
                 NetworkInfo n = getIPandMask();
                 System.out.println(n.ip+" "+n.subnetMask);
                 hosts = getMachines(n);
             } catch (Exception e) {
                 e.printStackTrace();
             }*/
-        List<Host> hosts = null;
-        final ObservableList<HostToDisplay> hostsToDisplay = FXCollections.observableArrayList(new HostToDisplay("ip", "mac", "name", "user"),
-                new HostToDisplay("ip1", "mac1", "name1", "user1"));
-        HostToDisplay h;
-           /* for (Host host : hosts) {
+        final ObservableList<HostToDisplay> hostsToDisplay = FXCollections.observableArrayList(new HostToDisplay("160.98.127.214", "D0-7E-35-66-A9-54", "Nico-HP", "Nicolas"),
+                new HostToDisplay("160.98.127.215", "D0-00-35-66-A9-54", "Greg-HP", "Grégory"));
+        /*HostToDisplay h;
+        final ObservableList<HostToDisplay> hostsToNotDisplay = supervisedUsersList.supervisedUserObservable;
+        for (Host host : hosts) {
                     for (User user : host.users) {
                         String u = "";
                         if (user.fullname != "") {
@@ -93,7 +101,7 @@ public class discoveryUsersList implements Initializable {
                         }
                         h = new HostToDisplay(host.ip, host.mac, host.name, u);
                         if(!hostsToNotDisplay.contains(h)){ // Display only not supervised hosts
-                            hostsToDisplay.add(new HostToDisplay(host.ip, host.mac, host.name, u));
+                            hostsToDisplay.add(h);
                         }
                     }
             };*/
@@ -161,6 +169,7 @@ public class discoveryUsersList implements Initializable {
                 jsonArray.add(user);
                 jsonObject.put("users",jsonArray);
             }
+            discoveryUsersList.getItems().removeAll(hostList);
             FileWriter jsonWriter = new FileWriter(supervisedUsersList.SUPERVISEDUSERSFILE);
             jsonObject.writeJSONString(jsonWriter);
             jsonWriter.close();
@@ -176,7 +185,7 @@ public class discoveryUsersList implements Initializable {
         Parent root = fxmlLoader.load(getClass().getResource("supervisedUsersList.fxml"));
         Scene scene = new Scene(root);
         stageMain.setScene(scene);
-        stageMain.setTitle("Discover network users");
+        stageMain.setTitle("Décourvrir les utilisateurs du réseau");
         stageMain.show();
     }
 
@@ -185,14 +194,13 @@ public class discoveryUsersList implements Initializable {
         while (interfaces.hasMoreElements()) {
             NetworkInterface networkInterface = interfaces.nextElement();
             if (!networkInterface.isUp() || networkInterface.isLoopback() || networkInterface.isVirtual()) continue;
-
             Enumeration<InetAddress> addresses = networkInterface.getInetAddresses();
             while(addresses.hasMoreElements()) {
                 String nin = networkInterface.getDisplayName();
                 String addr = addresses.nextElement().getHostAddress();
                 if (!nin.contains("Adapter") && !nin.contains("Virtual") && (addr.contains("160.98.") ||addr.contains("192.168.") || addr.contains("172.16.") || addr.contains("10."))) {
                     if (networkInterface.getInterfaceAddresses().size() == 1) return new NetworkInfo(addr, networkInterface.getInterfaceAddresses().get(0).getNetworkPrefixLength());
-                    else return new NetworkInfo(addr, networkInterface.getInterfaceAddresses().get(1).getNetworkPrefixLength());
+                    else return new NetworkInfo(addr, networkInterface.getInterfaceAddresses().get(3).getNetworkPrefixLength()); //OLD  new NetworkInfo(addr, networkInterface.getInterfaceAddresses().get(1).getNetworkPrefixLength());
                 }
             }
         }

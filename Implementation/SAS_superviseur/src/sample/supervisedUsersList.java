@@ -17,8 +17,6 @@ import javafx.stage.Stage;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
-
 import java.io.*;
 import java.net.URL;
 import java.util.Iterator;
@@ -28,17 +26,15 @@ public class supervisedUsersList implements Initializable {
 
     private static FXMLLoader fxmlLoader;
     private static Stage stageMain;
-    private final int port = 3000;
-    public static final String SUPERVISEDUSERSFILE = "/Users/Gregory/Desktop/hes-so/3 eme/Projet de semestre/PS2/SAS/Implementation/SAS_superviseur/supervisedUsers";
-
+    public static final String SUPERVISEDUSERSFILE = "supervisedUsers";
+    public static HostToDisplay hostToSend;
+    public static ObservableList supervisedUserObservable;
     @FXML
-    private TableView<HostToDisplay> supervisedUsersList= new TableView<>();
+    public TableView<HostToDisplay> supervisedUsersList= new TableView<>();
     @FXML
     private Button plusButton;
     @FXML
     private Button minusButton;
-    @FXML
-    private Button user;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -46,8 +42,8 @@ public class supervisedUsersList implements Initializable {
         populateSupervisedUserList();
         supervisedUsersList.setOnMouseClicked((MouseEvent event) -> {
             if (event.getButton().equals(MouseButton.PRIMARY) && event.getClickCount() == 2){
-                HostToDisplay host = supervisedUsersList.getSelectionModel().getSelectedItem();
-                System.out.println(host.getName());
+                hostToSend = supervisedUsersList.getSelectionModel().getSelectedItem();
+                System.out.println(hostToSend.getName());
                 this.stageMain = Main.stageMain;
                 Parent root = null;
                 try {
@@ -57,7 +53,8 @@ public class supervisedUsersList implements Initializable {
                 }
                 Scene scene = new Scene(root);
                 stageMain.setScene(scene);
-                stageMain.setTitle("Discover network users");
+                stageMain.setTitle("Statistiques de l'utilisateur");
+                stageMain.centerOnScreen();
                 stageMain.show();
 
             }
@@ -66,7 +63,7 @@ public class supervisedUsersList implements Initializable {
 
     private void populateSupervisedUserList(){
         try{
-            FileReader reader = new FileReader(SUPERVISEDUSERSFILE);
+            FileReader reader = new FileReader(this.SUPERVISEDUSERSFILE);
             JSONParser jsonParser = new JSONParser();
             JSONObject jsonObject = (JSONObject) jsonParser.parse(reader);
             // get the date from the JSON object
@@ -88,21 +85,13 @@ public class supervisedUsersList implements Initializable {
                 ipCol.setCellValueFactory(new PropertyValueFactory<HostToDisplay,String>("ip"));
                 macCol.setCellValueFactory(new PropertyValueFactory<HostToDisplay,String>("mac"));
             }
+
             supervisedUsersList.setItems(hostsToDisplay);
             supervisedUsersList.getColumns().addAll(usernameCol, machineCol, ipCol, macCol);
+            this.supervisedUserObservable = supervisedUsersList.getItems();
         }catch (Exception e){
             System.out.println("Create a new file ");
         }
-    }
-
-    @FXML
-    public void showUserInfos()throws IOException{
-        this.stageMain = Main.stageMain;
-        Parent root = fxmlLoader.load(getClass().getResource("UserStat.fxml"));
-        Scene scene = new Scene(root);
-        stageMain.setScene(scene);
-        stageMain.setTitle("Discover network users");
-        stageMain.show();
     }
 
     @FXML

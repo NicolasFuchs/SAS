@@ -22,9 +22,7 @@ public class Main extends Application{
 
     private static FXMLLoader fxmlLoader;
     public static Stage stageMain;
-    public static String supervisedUserIP;
-    public static String supervisedUserName;
-    private final int port = 3000;
+    public static final int port = 3000;
 
     public static void main(String[] args) {
         Application.launch(Main.class, args);

@@ -12,15 +12,14 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 public class JsonReader {
-    private static final String filePathBar = "/Users/Gregory/Desktop/hes-so/3 eme/Projet de semestre/PS2/SAS/Implementation/SAS_user/jsonSampleBar";
     private String userInfosPieChart;
     private String userInfosBarChart;
     private ServerConnection serverConnection;
     public JsonReader(){
         serverConnection = new ServerConnection();
         //userInfosPieChart = serverConnection.getUserInfo("http://"+Main.supervisedUserIP+":3000/charts/pieChart?user="+Main.supervisedUserName);
-        userInfosPieChart = serverConnection.getUserInfo("http://192.168.178.80:3000/charts/pieChart?user=Nicolas");
-        userInfosBarChart = serverConnection.getUserInfo("http://192.168.178.80:3000/charts/barChart");
+        userInfosPieChart = serverConnection.getUserInfo("http://"+supervisedUsersList.hostToSend.getIp()+":"+Main.port+"/charts/pieChart?user="+supervisedUsersList.hostToSend.getUser()); // NEW
+        userInfosBarChart = serverConnection.getUserInfo("http://"+supervisedUsersList.hostToSend.getIp()+":"+Main.port+"/charts/barChart"); // NEW
     }
 
     private ArrayList<Sector> readByCategory(JSONArray category, String date, String categoryName){
