@@ -36,10 +36,12 @@
                                 <AnchorPane minHeight="-Infinity" minWidth="-Infinity" prefHeight="50.0" prefWidth="1200.0" BorderPane.alignment="CENTER_RIGHT">
                                    <children>
                                       <ToggleButton fx:id="categoryToggleButton" layoutX="46.0" layoutY="12.0" mnemonicParsing="false" onAction="#handleSelectedToggle" text="Catégories" />
-                                      <CheckBox fx:id="displayGamesCheckbox" layoutX="941.0" layoutY="18.0" mnemonicParsing="false" onAction="#handleSelectedCheckBox" text="Jeux vidéos" />
-                                      <CheckBox fx:id="displayNetworksCheckbox" layoutX="798.0" layoutY="18.0" mnemonicParsing="false" onAction="#handleSelectedCheckBox" text="Réseaux sociaux" />
-                                      <CheckBox fx:id="displayCumulateTimeCheckbox" layoutX="1067.0" layoutY="18.0" mnemonicParsing="false" onAction="#handleSelectedCheckBox" text="Temps cumulé" />
+                                      <CheckBox fx:id="displayGamesCheckbox" layoutX="825.0" layoutY="17.0" mnemonicParsing="false" onAction="#handleSelectedCheckBox" text="Jeux vidéos" />
+                                      <CheckBox fx:id="displayNetworksCheckbox" layoutX="682.0" layoutY="17.0" mnemonicParsing="false" onAction="#handleSelectedCheckBox" text="Réseaux sociaux" />
+                                      <CheckBox fx:id="displayCumulateTimeCheckbox" layoutX="951.0" layoutY="17.0" mnemonicParsing="false" onAction="#handleSelectedCheckBox" text="Temps cumulé" />
                                     <ToggleButton fx:id="activityToggleButton" layoutX="131.0" layoutY="12.0" mnemonicParsing="false" onAction="#handleSelectedToggle" selected="true" text="Activités" />
+                                    <Label fx:id="cumuledTimeLabel" layoutX="1079.0" layoutY="4.0" prefHeight="42.0" prefWidth="312.0" />
+                                    <Label fx:id="dateLabel" layoutX="228.0" layoutY="17.0" prefHeight="17.0" prefWidth="300.0" />
                                    </children>
                                    <BorderPane.margin>
                                       <Insets right="100.0" />
