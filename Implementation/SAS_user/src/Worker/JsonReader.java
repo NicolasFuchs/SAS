@@ -14,11 +14,16 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
 public class JsonReader {
-    private static final String filePathPie = "/Users/Gregory/Desktop/hes-so/3 eme/Projet de semestre/PS2/SAS/Implementation/SAS_user/jsonSamplePie";
-    private static final String filePathBar = "/Users/Gregory/Desktop/hes-so/3 eme/Projet de semestre/PS2/SAS/Implementation/SAS_user/jsonSampleBar";
-   // private ServerConnection serverConnection;
+    private String userInfosPieChart;
+    private String userInfosBarChart;
+    private ServerConnection serverConnection;
+    private String myUserName = "Nicolas";
     public JsonReader(){
-        //serverConnection = new ServerConnection("url");
+        serverConnection = new ServerConnection();
+        //Récupérer son propre nom de session
+       // myUserName = System.getProperty("user.name");
+        userInfosPieChart = serverConnection.getUserInfo("http://192.168.178.80:3000/charts/pieChart?user="+myUserName);
+        userInfosBarChart = serverConnection.getUserInfo("http://192.168.178.80:3000/charts/barChart?user="+myUserName);
     }
 
     private ArrayList<Sector> readByCategory(JSONArray category, String date, String categoryName){
@@ -40,9 +45,11 @@ public class JsonReader {
     public ArrayList<Bar> readForBarChart(){
         ArrayList<Bar>infosBar = new ArrayList<Bar>();
         try {
-            FileReader reader = new FileReader(filePathBar);
+            //FileReader reader = new FileReader("/Users/Gregory/Desktop/hes-so/3 eme/Projet de semestre/PS2/SAS/Implementation/SAS_user/jsonSampleBar");
             JSONParser jsonParser = new JSONParser();
-            JSONObject jsonObject = (JSONObject) jsonParser.parse(reader);
+            JSONObject jsonObject = (JSONObject) jsonParser.parse(userInfosBarChart);
+
+            //JSONObject jsonObject = (JSONObject) jsonParser.parse(userInfosBarChart);
             int hour = 24;
             String date = (String) jsonObject.get("date");
             Bar barGames;
@@ -55,10 +62,6 @@ public class JsonReader {
                 infosBar.add(barGames);
                 infosBar.add(barNetworks);
             }
-        } catch (FileNotFoundException ex) {
-            ex.printStackTrace();
-        } catch (IOException ex) {
-            ex.printStackTrace();
         } catch (ParseException ex) {
             ex.printStackTrace();
         } catch (NullPointerException ex) {
@@ -73,11 +76,9 @@ public class JsonReader {
         ArrayList<Sector>infosGames;
         try {
             // read the json file
-            FileReader reader = new FileReader(filePathPie);
+            //FileReader reader = new FileReader("/Users/Gregory/Desktop/hes-so/3 eme/Projet de semestre/PS2/SAS/Implementation/SAS_user/jsonSamplePie");
             JSONParser jsonParser = new JSONParser();
-            JSONObject jsonObject = (JSONObject) jsonParser.parse(reader);
-
-
+            JSONObject jsonObject = (JSONObject) jsonParser.parse(userInfosPieChart);
             // get the date from the JSON object
             String date = (String) jsonObject.get("date");
             JSONArray games = (JSONArray) jsonObject.get("games");
@@ -90,11 +91,7 @@ public class JsonReader {
             for (int i = 0; i<infosNetworks.size();i++){
                 pieChartData.add(infosNetworks.get(i));
             }
-        } catch (FileNotFoundException ex) {
-            ex.printStackTrace();
-        } catch (IOException ex) {
-            ex.printStackTrace();
-        } catch (ParseException ex) {
+        }catch (ParseException ex) {
             ex.printStackTrace();
         } catch (NullPointerException ex) {
             ex.printStackTrace();

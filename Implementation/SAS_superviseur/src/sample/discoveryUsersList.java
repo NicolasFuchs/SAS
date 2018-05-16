@@ -19,10 +19,12 @@ import javafx.scene.layout.GridPane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.Pair;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.URL;
@@ -34,33 +36,67 @@ public class discoveryUsersList implements Initializable {
     private static Stage stageMain;
     private final int port = 3000;
     private String password;
+    private FileReader reader;
+    private boolean fileIsEmpty;
     @FXML private TableView<HostToDisplay> discoveryUsersList;
     @FXML private Button superviseButton;
     @FXML private Button cancelButton;
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        List<Host> hosts = null;
+        getSupervisedUserFile();
+        fillTableHostsToDiscover();
+    }
+
+    private void getSupervisedUserFile(){
         try {
-            NetworkInfo n = getIPandMask();
-            System.out.println(n.ip+" "+n.subnetMask);
-            hosts = getMachines(n);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        final ObservableList<HostToDisplay> hostsToDisplay = FXCollections.observableArrayList(/*new HostToDisplay("ip", "mac", "name", "user")*/);
-        for (Host host : hosts) {
-            for (User user : host.users) {
-                String u = "";
-                if (user.fullname != "") {
-                    u = "Nom complet : " + user.fullname;
-                }
-                if (user.name != "") {
-                    u += "\nNom : " + user.name;
-                }
-                hostsToDisplay.add(new HostToDisplay(host.ip, host.mac, host.name, u));
+            reader = new FileReader(supervisedUsersList.SUPERVISEDUSERSFILE); // Get supervised users
+            JSONParser jsonParser = new JSONParser();
+            JSONObject jsonObject = (JSONObject) jsonParser.parse(reader);
+            JSONArray users = (JSONArray) jsonObject.get("users");
+            JSONObject userAttributes;
+            Iterator i = users.iterator(); // Iterate the game objects
+            final ObservableList<HostToDisplay> hostsToNotDisplay = FXCollections.observableArrayList();
+            while (i.hasNext()) { // List contains supervised users
+                userAttributes = (JSONObject) i.next();
+                hostsToNotDisplay.add(new HostToDisplay(userAttributes.get("ip").toString(), userAttributes.get("mac").toString(),
+                        userAttributes.get("name").toString(),userAttributes.get("user").toString()));
             }
-        };
+        } catch (FileNotFoundException e) {
+            System.out.println("Le fichier n'existe pas encore");
+        } catch (ParseException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            System.out.println("Le fichier n'existe pas encore");
+        }
+    }
+    private void fillTableHostsToDiscover(){
+        /*try {
+                NetworkInfo n = getIPandMask();
+                System.out.println(n.ip+" "+n.subnetMask);
+                hosts = getMachines(n);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }*/
+        List<Host> hosts = null;
+        final ObservableList<HostToDisplay> hostsToDisplay = FXCollections.observableArrayList(new HostToDisplay("ip", "mac", "name", "user"),
+                new HostToDisplay("ip1", "mac1", "name1", "user1"));
+        HostToDisplay h;
+           /* for (Host host : hosts) {
+                    for (User user : host.users) {
+                        String u = "";
+                        if (user.fullname != "") {
+                            u = "Nom complet : " + user.fullname;
+                        }
+                        if (user.name != "") {
+                            u += "\nNom : " + user.name;
+                        }
+                        h = new HostToDisplay(host.ip, host.mac, host.name, u);
+                        if(!hostsToNotDisplay.contains(h)){ // Display only not supervised hosts
+                            hostsToDisplay.add(new HostToDisplay(host.ip, host.mac, host.name, u));
+                        }
+                    }
+            };*/
         TableColumn usernameCol = new TableColumn("Nom d'utilisateur");
         usernameCol.setCellValueFactory(new PropertyValueFactory<HostToDisplay,String>("user"));
         TableColumn machineCol = new TableColumn("Nom de la machine");
@@ -71,11 +107,66 @@ public class discoveryUsersList implements Initializable {
         macCol.setCellValueFactory(new PropertyValueFactory<HostToDisplay,String>("mac"));
         discoveryUsersList.setItems(hostsToDisplay);
         discoveryUsersList.getColumns().addAll(usernameCol, machineCol, ipCol, macCol);
+        discoveryUsersList.getSelectionModel().setSelectionMode(
+                SelectionMode.MULTIPLE
+        );
     }
-
     @FXML
     public void supervise() {
-        System.out.println("Supervise button clicked");
+        ObservableList<HostToDisplay>existingHostList = null;
+        ObservableList<HostToDisplay>hostList;
+        try {
+            reader = new FileReader(supervisedUsersList.SUPERVISEDUSERSFILE); // Get supervised users
+            existingHostList = FXCollections.observableArrayList();
+            JSONParser jsonParser = new JSONParser();
+            JSONObject jsonObject = (JSONObject) jsonParser.parse(reader);
+            JSONArray users = (JSONArray) jsonObject.get("users");
+            JSONObject userAttributes;
+            Iterator i = users.iterator(); // Iterate the game objects
+            while (i.hasNext()) { // List contains supervised users
+                userAttributes = (JSONObject) i.next();
+                existingHostList.add(new HostToDisplay(userAttributes.get("ip").toString(), userAttributes.get("mac").toString(),
+                        userAttributes.get("name").toString(),userAttributes.get("user").toString()));
+            }
+
+        } catch (FileNotFoundException e) {
+            System.out.println("Le fichier n'existe pas encore");
+        } catch (ParseException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        try{
+            hostList = discoveryUsersList.getSelectionModel().getSelectedItems();
+            JSONObject jsonObject = new JSONObject();
+            JSONArray jsonArray = new JSONArray();
+            JSONObject user;
+            if(existingHostList!=null){
+                for (int i=0; i<existingHostList.size();i++){
+                    user = new JSONObject();
+                    user.put("name", existingHostList.get(i).getName());
+                    user.put("ip", existingHostList.get(i).getIp());
+                    user.put("mac", existingHostList.get(i).getMac());
+                    user.put("user",existingHostList.get(i).getUser());
+                    jsonArray.add(user);
+                    jsonObject.put("users",jsonArray);
+                }
+            }
+            for (int i=0; i<hostList.size();i++){
+                user = new JSONObject();
+                user.put("name", hostList.get(i).getName());
+                user.put("ip", hostList.get(i).getIp());
+                user.put("mac", hostList.get(i).getMac());
+                user.put("user",hostList.get(i).getUser());
+                jsonArray.add(user);
+                jsonObject.put("users",jsonArray);
+            }
+            FileWriter jsonWriter = new FileWriter(supervisedUsersList.SUPERVISEDUSERSFILE);
+            jsonObject.writeJSONString(jsonWriter);
+            jsonWriter.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @FXML
@@ -144,20 +235,26 @@ public class discoveryUsersList implements Initializable {
     }
 
     private List<Host> getMachines(NetworkInfo networkInfo) throws Exception {
-        displayPasswordDialog();
-        String[] command ={"/bin/bash","-c","echo "+password+" | sudo -S nmap -sP " + networkInfo.ip + "/" + networkInfo.subnetMask};
-        Process p = Runtime.getRuntime().exec(command);
-        p.waitFor();
+        Process p = null;
+        if(System.getProperty("os.name").equals("Mac OS X")) { // do a readline because there is an additionnal line with mac os
+            displayPasswordDialog();
+            String[] command = new String[] {"/bin/bash","-c","echo "+password+" | sudo -S nmap -sP " + networkInfo.ip + "/" + networkInfo.subnetMask};
+            p = Runtime.getRuntime().exec(command);
 
+        }else{
+            String command = "nmap -sP " + networkInfo.ip + "/" + networkInfo.subnetMask;
+            p = Runtime.getRuntime().exec(command);
+        }
+        p.waitFor();
         BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
         /*String myString = "First line\none two three four internetbox.home\nThird line\none two ThisIsMyMacAddress\none two three four Nico-HP.home (160.98.126.85)\nLast line";
         InputStream is = new ByteArrayInputStream(Charset.forName("UTF-8").encode(myString).array());
 
         BufferedReader reader = new BufferedReader(new InputStreamReader(is));*/
         String line = "";
-        if(System.getProperty("os.name").equals("Mac OS X")){ // do a readline because there is an additionnal line with mac os
+        //if(System.getProperty("os.name").equals("Mac OS X")){ // do a readline because there is an additionnal line with mac os
             line = reader.readLine();
-        }
+        //}
         line = reader.readLine();
         String[] splittedGateway = line.split("\\s+")[4].split("\\.");
         String suffix = "." + splittedGateway[splittedGateway.length-1];

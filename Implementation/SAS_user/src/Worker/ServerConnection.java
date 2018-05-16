@@ -13,32 +13,26 @@ public class ServerConnection {
     private URL url;
     private HttpURLConnection connection;
 
-    public ServerConnection(String targetUrl) {
+   /* public ServerConnection(String targetUrl) {
         this.targetUrl = targetUrl;
-        createConnection(targetUrl);
+        createConnectionForPie(targetUrl);
+
+    }*/
+
+    public ServerConnection() {
+
 
     }
 
-    public static boolean checkURLExists(String targetUrl) {
-        HttpURLConnection httpUrlConn;
-        try {
-            httpUrlConn = (HttpURLConnection) new URL(targetUrl).openConnection();
-            httpUrlConn.setRequestMethod("HEAD");
-            return (httpUrlConn.getResponseCode() == HttpURLConnection.HTTP_OK);
-        } catch (Exception e) {
-            return false;
-        }
-    }
-
-    private void createConnection(String targetURL){
+    public String getUserInfo(String targetURL){
         connection = null;
+        String userInfos="";
         try {
             url = new URL(targetURL);
             connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("GET");
             BufferedReader br = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-            StringBuilder response = new StringBuilder();
-
+            userInfos = br.readLine();
         } catch (MalformedURLException e) {
             e.printStackTrace();
         } catch (ProtocolException e) {
@@ -46,5 +40,6 @@ public class ServerConnection {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        return userInfos;
     }
 }
