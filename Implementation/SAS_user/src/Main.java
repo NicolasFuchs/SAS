@@ -9,6 +9,7 @@ import javafx.event.ActionEvent;
 
 public class Main extends Application{
     private FXMLLoader fxmlLoader;
+    public static int port=3000;
     public static void main(String[] args) {
         Application.launch(Main.class, args);
     }

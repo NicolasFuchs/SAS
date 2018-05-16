@@ -1,13 +1,8 @@
 package Worker;
 
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-import Ihm.MyStat;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -17,11 +12,11 @@ public class JsonReader {
     private String userInfosPieChart;
     private String userInfosBarChart;
     private ServerConnection serverConnection;
-    private String myUserName = "Nicolas";
+    private String myUserName;
     public JsonReader(){
         serverConnection = new ServerConnection();
         //Récupérer son propre nom de session
-       // myUserName = System.getProperty("user.name");
+        myUserName = System.getProperty("user.name");
         userInfosPieChart = serverConnection.getUserInfo("http://192.168.178.80:3000/charts/pieChart?user="+myUserName);
         userInfosBarChart = serverConnection.getUserInfo("http://192.168.178.80:3000/charts/barChart?user="+myUserName);
     }

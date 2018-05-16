@@ -1,5 +1,6 @@
 package Ihm;
 import Worker.JsonReader;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.fxml.Initializable;
@@ -7,6 +8,7 @@ import javafx.scene.chart.*;
 
 import java.io.File;
 import java.net.URL;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
 import javafx.collections.FXCollections;
@@ -15,6 +17,7 @@ import Worker.Sector;
 import Worker.Bar;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Border;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
@@ -24,7 +27,10 @@ public class MyStat implements Initializable{
     // Link the graphics elements with the fxml
     @FXML
     private PieChart dailyPieChart;
-
+    @FXML
+    private Label dateLabel;
+    @FXML
+    private Label cumuledTimeLabel;
     @FXML
     private TextArea userNoteTextArea;
 
@@ -49,6 +55,8 @@ public class MyStat implements Initializable{
     // These 3 variables indicates if the graphics are displayed
     private boolean gamesDisplayed;
     private boolean networkDisplayed;
+    double networkTimes = 0;
+    double gamesTimes = 0;
     private boolean cumulateTimeDisplayed;
     //The variables contains the values of each series for the barchart
     private XYChart.Series<String,Number> series1;
@@ -75,8 +83,11 @@ public class MyStat implements Initializable{
         jsonReader = new JsonReader();
         infosBarChart = jsonReader.readForBarChart();
         infosForPieChart = jsonReader.readForPieChart();
-        File file = new File("/Users/Gregory/Desktop/hes-so/3 eme/Projet de semestre/PS2/SAS/Implementation/SAS_user/userProfile.JPG");
+        File file = new File("userProfile.JPG");
         Image image = new Image(file.toURI().toString());
+        if(!infosBarChart.isEmpty()&&infosBarChart!=null){ // NEW
+            dateLabel.setText("Date: "+infosBarChart.get(0).getDate()); // Get days date
+        }
         centerPane.getChildren().addAll(dailyBarChart);
         userNoteTextArea.setText("Les notes concernant l'utilisateur");
         usersImageView.setImage(image);
@@ -86,6 +97,8 @@ public class MyStat implements Initializable{
         categoryToggleButton.setToggleGroup(group);
         handleSelectedCheckBox();
         handleSelectedToggle();
+        dailyPieChart.setStartAngle(90); // NEW
+        dailyPieChart.setClockwise(true); // NEW
     }
     @FXML
     public void handleSelectedToggle() {
@@ -99,8 +112,7 @@ public class MyStat implements Initializable{
     }
 
     private void displayCumulateTimePieChart() {
-        double networkTimes = 0;
-        double gamesTimes = 0;
+
         Sector sector;
         ObservableList<PieChart.Data> pieChartData = FXCollections.observableArrayList();
         for (int i = 0; i<infosForPieChart.size();i++){
@@ -114,19 +126,60 @@ public class MyStat implements Initializable{
         pieChartData.add(new PieChart.Data("Réseaux sociaux",networkTimes));
         pieChartData.add(new PieChart.Data("Jeux vidéos",gamesTimes));
         dailyPieChart.setData(pieChartData);
+        setTooltip(pieChartData, 1);
     }
+
+    private void setTooltip(ObservableList pieChartData, int cat){ // NEW
+        if(cat == 2){
+            for (PieChart.Data data : dailyPieChart.getData()) {
+                int idSecteur = getSectorIdByName(data.getName());
+                if(idSecteur!=-1){
+                    data.getNode().addEventHandler(MouseEvent.MOUSE_PRESSED,
+                            new EventHandler<MouseEvent>() {
+                                @Override public void handle(MouseEvent e) {
+                                    Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                                    alert.setTitle("Information du secteur");
+                                    alert.setHeaderText("Information du secteur");
+                                    double total =(networkTimes+gamesTimes)/60;
+                                    double time = (infosForPieChart.get(idSecteur).getTime()/60);
+                                    double pourcentage = ((time/total)*100);
+                                    new DecimalFormat("#.##").format(pourcentage);
+                                    alert.setContentText("Temps passé sur "+data.getName()+" "+(int)time+" minutes\n"
+                                            +"Le temps passé correspond à "+pourcentage+"% du temps total qui est "+((int)(total))+" minutes");
+                                    alert.showAndWait();
+                                }
+                            });
+                }
+            }
+            dailyPieChart.setData(pieChartData);
+            dailyPieChart.getData().stream().forEach(data -> {
+                Tooltip tooltip = new Tooltip();
+                tooltip.setText(data.getName()+" "+data.getPieValue());
+                Tooltip.install(data.getNode(), tooltip);
+            });
+        }
+    }
+    private int getSectorIdByName(String name){
+        for(int i = 0;i<infosForPieChart.size();i++){
+            if(infosForPieChart.get(i).getName().equals(name)){
+                return i;
+            }
+        }
+        return -1;
+    }
+
 
     public void displayPieChart(){
         ObservableList<PieChart.Data> pieChartData = FXCollections.observableArrayList();
         for (int i = 0; i<infosForPieChart.size();i++){
             pieChartData.add(new PieChart.Data(infosForPieChart.get(i).getName(),infosForPieChart.get(i).getTime()));
         }
-        dailyPieChart.setData(pieChartData);
+        //dailyPieChart.setData(pieChartData); A VOIR SIL FAUT GARDER
     }
 
     public void displayGamesBarChart(ArrayList<Bar>infosBarChart){
         series1 = new XYChart.Series();
-        series1.setName("Games");
+        series1.setName("Jeux vidéos");
         double time;
         for(int i=0; i<infosBarChart.size();i++){
             if(infosBarChart.get(i).getCategory().equals("games")){
@@ -141,7 +194,7 @@ public class MyStat implements Initializable{
 
     public void displayNetworksBarChart(ArrayList<Bar>infosBarChart){
         series2 = new XYChart.Series();
-        series2.setName("Networks");
+        series2.setName("Réseaux sociaux");
         double time;
         for(int i=0; i<infosBarChart.size();i++){
             if(infosBarChart.get(i).getCategory().equals("networks")){
@@ -155,24 +208,42 @@ public class MyStat implements Initializable{
     }
 
     public void displayCumulateTimeBarChart(ArrayList<Bar>infosBarChart){
-        System.out.println("Games cumuled "+cumulateGamesTime);
-        System.out.println("Networks cumuled "+cumulateNetworkTime);
+        displayCumulateTimeCheckbox.setSelected(true);
+        if (gamesDisplayed && networkDisplayed) {
+            cumuledTimeLabel.setText("Temps cumulé sur les jeux vidéos: " + (int) cumulateGamesTime + " minutes\n" + "Temps cumulé sur les réseaux sociaux: " + (int) cumulateNetworkTime + " minutes");
+        } else if (gamesDisplayed || networkDisplayed) {
+            if (gamesDisplayed) {
+                cumuledTimeLabel.setText("Temps cumulé sur les jeux vidéos: " + (int) cumulateGamesTime + " minutes");
+            } else {
+                cumuledTimeLabel.setText("Temps cumulé sur les réseaux sociaux: " + (int) cumulateNetworkTime + " minutes");
+            }
+        }
+        cumuledTimeLabel.setWrapText(true);
         cumulateTimeDisplayed = true;
     }
-
     public void hiddeGamesBarChart(){
+        if(displayCumulateTimeCheckbox.isSelected()){
+            displayCumulateTimeCheckbox.setSelected(false);
+            cumuledTimeLabel.setText("");
+        }
         dailyBarChart.getData().removeAll(series1);
         gamesDisplayed = false;
     }
 
     public void hiddeNetworksBarChart(){
+        if(displayCumulateTimeCheckbox.isSelected()){
+            displayCumulateTimeCheckbox.setSelected(false);
+            cumuledTimeLabel.setText("");
+        }
         dailyBarChart.getData().removeAll(series2);
         networkDisplayed = false;
     }
 
     public void hiddeCumulateTime(){
+        cumuledTimeLabel.setText("");
         cumulateTimeDisplayed = false;
     }
+
 
     @FXML
     public void handleSelectedCheckBox() {
