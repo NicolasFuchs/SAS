@@ -19,51 +19,134 @@ var socialEntries = (fs.existsSync("checkFiles/socialEntries.txt"))?fs.readFileS
 var gameEntries = (fs.existsSync("checkFiles/gameEntries.txt"))?fs.readFileSync("checkFiles/gameEntries.txt", "utf8").split("\r\n"):[];
 var entries = [];
 
+var activityName = [];
+var activityTime = [];
+var activityCategory = [];
 var lastSite = "";
 var lastCategory = "";
 var accumulatedTime = 0;
-var date = getDate();
-var piejson = {date: date, games: [], networks: []};
+var date;
 
 router.get("/pieChart", function(req, res) {
+    date = getDate();
     var filename = req.query.user + "_log_" + date;
     entries = fs.readFileSync(filename, "utf8").split("\n");
     entries = entries.sort();
 
     getCategory(entries, 0, function () {
-        if (lastCategory === "socialNetwork") {
-            piejson.networks.push({name: lastSite, totalTime: accumulatedTime});
-        } else if (lastCategory === "game") {
-            piejson.games.push({name: lastSite, totalTime: accumulatedTime});
+        var index = activityName.indexOf(lastSite);
+        if (index === -1) {
+            activityName.push(lastSite);
+            activityTime.push(accumulatedTime);
+            activityCategory.push(lastCategory);
+        } else {
+            activityTime[index] += accumulatedTime;
+        }
+
+        var piejson = {date: date, games: [], networks: []};
+        for (var i = 0; i < activityName.length; i++) {
+            if (activityCategory[i] === "socialNetwork") {
+                piejson.networks.push({name: activityName[i], totalTime: activityTime[i]});
+            } else if (activityCategory[i] === "game") {
+                piejson.games.push({name: activityName[i], totalTime: activityTime[i]});
+            }
         }
 
         console.log(piejson);
-        res.send("piechart data sent");
+        res.send(piejson);
     });
 });
 
 // Has to be called after pieChart
-/*
 router.get("/barChart", function(req, res) {
-    for(var i = 0; i < entries.length; i++) {
-        var splittedEntry = entries[i].split("|");
-        var indexOrder;
-        if (splittedEntry[1].startsWith("http")) {
-            indexOrder = [2,3,4,0,1,5];
-        } else {
-            indexOrder = [4,5,6,0,3,1,2,7];
+    for (var i = 0; i < entries.length; i++) {
+        if (entries[i] !== "") {
+            var splittedEntry = entries[i].split("|");
+            var indexOrder;
+            if (splittedEntry[1].startsWith("http")) {
+                indexOrder = [0,2,3,4,1,5];
+            } else {
+                indexOrder = [0,4,5,6,1,2,3,7];
+            }
+            var reorderedEntry = "";
+            for (var j = 0; j < indexOrder.length; j++) {
+                reorderedEntry += splittedEntry[indexOrder[j]] + "|";
+            }
+            entries[i] = reorderedEntry;
         }
-        var reorderedEntry = "";
-        for (var j = 0; j < indexOrder.length; j++) {
-            reorderedEntry += splittedEntry[indexOrder[j]] + "|";
-        }
-        entries[i] = reorderedEntry;
     }
     entries = entries.sort();
-
-    res.send("barchart data sent");
+    var barjson = { date: date,
+                    "0": {"games": 0, "networks": 0}, "1": {"games": 0, "networks": 0}, "2": {"games": 0, "networks": 0}, "3": {"games": 0, "networks": 0},
+                    "4": {"games": 0, "networks": 0}, "5": {"games": 0, "networks": 0}, "6": {"games": 0, "networks": 0}, "7": {"games": 0, "networks": 0},
+                    "8": {"games": 0, "networks": 0}, "9": {"games": 0, "networks": 0}, "10": {"games": 0, "networks": 0}, "11": {"games": 0, "networks": 0},
+                    "12": {"games": 0, "networks": 0}, "13": {"games": 0, "networks": 0}, "14": {"games": 0, "networks": 0}, "15": {"games": 0, "networks": 0},
+                    "16": {"games": 0, "networks": 0}, "17": {"games": 0, "networks": 0}, "18": {"games": 0, "networks": 0}, "19": {"games": 0, "networks": 0},
+                    "20": {"games": 0, "networks": 0}, "21": {"games": 0, "networks": 0}, "22": {"games": 0, "networks": 0}, "23": {"games": 0, "networks": 0}};
+    var currentHour = NaN;
+    var accumulatedSocialTime = 0;
+    var accumulatedGameTime = 0;
+    for (var i = 0; i < entries.length; i++) {
+        var splittedEntry = entries[i].split("|");
+        var begin = new Date(splittedEntry[1].replace(/\+0.:00/g, "+00:00"));
+        var end = new Date(splittedEntry[2].replace(/\+0.:00/g, "+00:00"));
+        if (end.getUTCHours() === begin.getUTCHours()) {
+            if (begin.getUTCHours() !== currentHour && !isNaN(currentHour)) {
+                barjson[currentHour] = {"games": accumulatedGameTime, "networks": accumulatedSocialTime};
+                accumulatedGameTime = 0;
+                accumulatedSocialTime = 0;
+            }
+            if (socialEntries.includes(splittedEntry[4])) {
+                accumulatedSocialTime += parseFloat(splittedEntry[3]);
+                currentHour = end.getUTCHours();
+            } else if (gameEntries.includes(splittedEntry[4])) {
+                accumulatedGameTime += parseFloat(splittedEntry[3]);
+                currentHour = end.getUTCHours();
+            }
+        } else {
+            if (begin.getUTCHours() !== currentHour && !isNaN(currentHour)) {
+                barjson[currentHour] = {"games": accumulatedGameTime, "networks": accumulatedSocialTime};
+                currentHour = begin.getUTCHours();
+                accumulatedGameTime = 0;
+                accumulatedSocialTime = 0;
+            }
+            if (socialEntries.includes(splittedEntry[4])) {
+                var splitDate = new Date(begin);
+                splitDate.setUTCHours(begin.getUTCHours()+1); splitDate.setUTCMinutes(0); splitDate.setUTCSeconds(0); splitDate.setUTCMilliseconds(0);
+                accumulatedSocialTime += (splitDate.getTime() - begin.getTime())/1000;
+                barjson[currentHour++] = {"games": accumulatedGameTime, "networks": accumulatedSocialTime};
+                for (var j = 0; j < end.getUTCHours() - begin.getUTCHours() - 1; j++) {
+                    barjson[currentHour++] = {"games": 0, "networks": 3600};
+                }
+                if (i < entries.length-1) {
+                    splitDate = new Date(end);
+                    splitDate.setUTCHours(end.getUTCHours()); splitDate.setUTCMinutes(0); splitDate.setUTCSeconds(0); splitDate.setUTCMilliseconds(0);
+                    accumulatedSocialTime = (end.getTime() - splitDate.getTime())/1000;
+                    accumulatedGameTime = 0;
+                }
+                currentHour = end.getUTCHours();
+            } else if (gameEntries.includes(splittedEntry[4])) {
+                var splitDate = new Date(begin);
+                splitDate.setUTCHours(begin.getUTCHours()+1); splitDate.setUTCMinutes(0); splitDate.setUTCSeconds(0); splitDate.setUTCMilliseconds(0);
+                accumulatedGameTime += (splitDate.getTime() - begin.getTime())/1000;
+                barjson[currentHour++] = {"games": accumulatedGameTime, "networks": accumulatedSocialTime};
+                for (var j = 0; j < end.getUTCHours() - begin.getUTCHours() - 1; j++) {
+                    barjson[currentHour++] = {"games": 3600, "networks": 0};
+                }
+                if (i < entries.length-1) {
+                    splitDate = new Date(end);
+                    splitDate.setUTCHours(end.getUTCHours()); splitDate.setUTCMinutes(0); splitDate.setUTCSeconds(0); splitDate.setUTCMilliseconds(0);
+                    accumulatedGameTime = (end.getTime() - splitDate.getTime())/1000;
+                    accumulatedSocialTime = 0;
+                }
+                currentHour = end.getUTCHours();
+            }
+        }
+    }
+    barjson[currentHour] = {"games": accumulatedGameTime, "networks": accumulatedSocialTime};
+    console.log(barjson);
+    res.send(barjson);
 });
-*/
 
 function getCategory(entries, i, callback) {
     if (i < entries.length) {
@@ -72,11 +155,15 @@ function getCategory(entries, i, callback) {
             if (splittedEntry[1] === lastSite) {
                 accumulatedTime += parseFloat((lastSite.startsWith("http")) ? splittedEntry[4] : splittedEntry[6]);
             } else {
-                if (lastCategory === "socialNetwork") {
-                    piejson.networks.push({name: lastSite, totalTime: accumulatedTime});
-                } else if (lastCategory === "game") {
-                    piejson.games.push({name: lastSite, totalTime: accumulatedTime});
+                var index = activityName.indexOf(lastSite);
+                if (index === -1) {
+                    activityName.push(lastSite);
+                    activityTime.push(accumulatedTime);
+                    activityCategory.push(lastCategory);
+                } else {
+                    activityTime[index] += accumulatedTime;
                 }
+
                 if (splittedEntry[1].startsWith("http")) {                  // website
                     var splittedSite = splittedEntry[1].split("/");
                     var sitefullname = splittedSite[2];
@@ -142,14 +229,16 @@ function checkLists(isWebsite, sitename, splittedEntry) {
     } else if (!isWebsite) {
         // check avec le fichier ConcreteGamesList.js
         var splittedPath = splittedEntry[2].split((process.platform === "win32")? "\\" : "/");
-        var parentDirectory = splittedPath[splittedPath.length-3];
-        for (var j = 0; j < gameDownloadSitesList.length; j++) {                            // Game Download Sites list test
-            if (parentDirectory.toLowerCase() === gameSitesList[j].toLowerCase()) {
-                fs.appendFileSync("checkFiles/gameEntries.txt", splittedEntry[1] + "\r\n");
-                lastCategory = "game";
-                response = lastCategory;
-                categoryFound = true;
-                break;
+        if (splittedPath.length > 2) {
+            var parentDirectory = splittedPath[splittedPath.length-3];
+            for (var j = 0; j < gameDownloadSitesList.length; j++) {                                    // Game Download Sites list test
+                if (parentDirectory.toLowerCase() === gameDownloadSitesList[j].toLowerCase()) {
+                    fs.appendFileSync("checkFiles/gameEntries.txt", splittedEntry[1] + "\r\n");
+                    lastCategory = "game";
+                    response = lastCategory;
+                    categoryFound = true;
+                    break;
+                }
             }
         }
     }

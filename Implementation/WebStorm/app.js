@@ -30,7 +30,6 @@ app.use("/supervise", supervise);
 app.use('/sniff', sniff);
 
 
-
 var request = require('request');
 var options = {
     url: 'http://localhost:3000/charts/pieChart',
@@ -38,9 +37,14 @@ var options = {
     qs: {user:'Nicolas'}
 };
 request(options, function(error, response, body) {
-    console.log('request sent!');
+    options = {
+        url: 'http://localhost:3000/charts/barChart',
+        method: 'GET'
+    };
+    request(options, function(error, response, body) {
+        console.log("Two requests done!");
+    });
 });
-
 
 
 // catch 404 and forward to error handler
