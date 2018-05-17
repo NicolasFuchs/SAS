@@ -1,5 +1,7 @@
 package sample;
 
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
@@ -29,38 +31,29 @@ import java.util.ResourceBundle;
 import java.util.Set;
 
 public class UserStat implements Initializable {
+    @FXML private Slider socialNetworkSlider;
+    @FXML private Slider gameSlider;
+    @FXML private ProgressBar socialNetworkProgressBar;
+    @FXML private ProgressBar gameProgressBar;
+    @FXML private Button socialNetworkObjectiveButton;
+    @FXML private Button gameObjectiveButton;
     @FXML private Label cumuledTimeLabel;
-    @FXML
-    private PieChart dailyPieChart;
-    @FXML
-    private Label dateLabel;
-    @FXML
-    private TextArea userNoteTextArea;
+    @FXML private PieChart dailyPieChart;
+    @FXML private Label dateLabel;
+    @FXML private TextArea userNoteTextArea;
     private BarChart dailyBarChart;
-    @FXML
-    private CheckBox displayGamesCheckbox;
-    @FXML
-    private CheckBox displayNetworksCheckbox;
-    @FXML
-    private CheckBox displayCumulateTimeCheckbox;
-    @FXML
-    private BorderPane tabBorderPane;
-    @FXML
-    private Pane centerPane;
-    @FXML
-    private ToggleButton activityToggleButton;
-    @FXML
-    private ToggleButton categoryToggleButton;
-    @FXML
-    private ImageView usersImageView;
-    @FXML
-    private ImageView backImageView;
-    @FXML
-    private Button goBackButton;
-    @FXML
-    private Button editButton;
-    @FXML
-    private Label userActivityLabel;
+    @FXML private CheckBox displayGamesCheckbox;
+    @FXML private CheckBox displayNetworksCheckbox;
+    @FXML private CheckBox displayCumulateTimeCheckbox;
+    @FXML private BorderPane tabBorderPane;
+    @FXML private Pane centerPane;
+    @FXML private ToggleButton activityToggleButton;
+    @FXML private ToggleButton categoryToggleButton;
+    @FXML private ImageView usersImageView;
+    @FXML private ImageView backImageView;
+    @FXML private Button goBackButton;
+    @FXML private Button editButton;
+    @FXML private Label userActivityLabel;
     private HostToDisplay supervisedUser;
     private double networkTimes = 0;
     private double gamesTimes = 0;
@@ -85,6 +78,23 @@ public class UserStat implements Initializable {
     ArrayList<Sector> infosForPieChart;
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+
+        //Nico
+        socialNetworkSlider.setMin(0);
+        socialNetworkSlider.setMax(24);
+        gameSlider.setMin(0);
+        gameSlider.setMax(0);
+        socialNetworkSlider.setMinWidth(socialNetworkProgressBar.getMinWidth());
+        socialNetworkSlider.setMaxWidth(socialNetworkProgressBar.getMaxWidth());
+        socialNetworkSlider.setPrefWidth(socialNetworkProgressBar.getPrefWidth());
+
+        socialNetworkSlider.valueProperty().addListener(new ChangeListener<Number>() {
+            public void changed(ObservableValue<? extends Number> ov, Number old_val, Number new_val) {
+                socialNetworkProgressBar.setProgress(new_val.doubleValue()/24);
+            }
+        });
+        //
+
         displayGamesCheckbox.setSelected(true);
         File file = new File("userProfile.JPG");
         Image image = new Image(file.toURI().toString());
@@ -126,12 +136,12 @@ public class UserStat implements Initializable {
         Parent root = null;
         try {
             root = fxmlLoader.load(getClass().getResource("supervisedUsersList.fxml"));
-        Scene scene = new Scene(root);
-        stageMain.setScene(scene);
-        stageMain.setTitle("Liste des utilisateurs supervisés");
-        stageMain.setScene(scene);
-        stageMain.centerOnScreen();
-        stageMain.show();
+            Scene scene = new Scene(root);
+            stageMain.setScene(scene);
+            stageMain.setTitle("Liste des utilisateurs supervisés");
+            stageMain.setScene(scene);
+            stageMain.centerOnScreen();
+            stageMain.show();
         } catch (IOException e) {
         e.printStackTrace();
     }
@@ -327,5 +337,15 @@ public class UserStat implements Initializable {
         }else if(!isCumulateTimeSelected){
             hiddeCumulateTime();
         }
+    }
+
+    @FXML
+    public void activateSocialObjective() {
+
+    }
+
+    @FXML
+    public void activateGameObjective() {
+
     }
 }

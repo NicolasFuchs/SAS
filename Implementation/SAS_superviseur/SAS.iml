@@ -7,7 +7,7 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="module-library">
+    <orderEntry type="module-library" exported="">
       <library>
         <CLASSES>
           <root url="jar://$MODULE_DIR$/java-json.jar!/" />
@@ -18,8 +18,8 @@
         </SOURCES>
       </library>
     </orderEntry>
-    <orderEntry type="library" name="json-simple-1.1" level="project" />
-    <orderEntry type="library" name="jfoenix-9.0.1" level="project" />
-    <orderEntry type="library" name="java-json" level="project" />
+    <orderEntry type="library" exported="" name="json-simple-1.1" level="project" />
+    <orderEntry type="library" exported="" name="jfoenix-9.0.1" level="project" />
+    <orderEntry type="library" exported="" name="java-json" level="project" />
   </component>
 </module>

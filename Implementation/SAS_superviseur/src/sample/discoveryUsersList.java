@@ -1,6 +1,5 @@
 package sample;
 
-import com.oracle.javafx.jmx.json.JSONException;
 import javafx.animation.Transition;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
@@ -71,40 +70,46 @@ public class discoveryUsersList implements Initializable {
             System.out.println("Le fichier n'existe pas encore");
         } catch (IOException e) {
             System.out.println("Le fichier n'existe pas encore");
-        } catch (JSONException e) {
-            e.printStackTrace();
         } catch (ParseException e) {
             e.printStackTrace();
         }
     }
     private void fillTableHostsToDiscover(){
         List<Host> hosts = null;
-       /* try {
+        try {
                 NetworkInfo n = getIPandMask();
                 System.out.println(n.ip+" "+n.subnetMask);
                 hosts = getMachines(n);
             } catch (Exception e) {
                 e.printStackTrace();
-            }*/
-        final ObservableList<HostToDisplay> hostsToDisplay = FXCollections.observableArrayList(new HostToDisplay("160.98.127.214", "D0-7E-35-66-A9-54", "Nico-HP", "Nicolas"),
-                new HostToDisplay("160.98.127.215", "D0-00-35-66-A9-54", "Greg-HP", "Grégory"));
-        /*HostToDisplay h;
+            }
+        //final ObservableList<HostToDisplay> hostsToDisplay = FXCollections.observableArrayList(new HostToDisplay("160.98.127.214", "D0-7E-35-66-A9-54", "Nico-HP", "Nicolas"),
+        //        new HostToDisplay("160.98.127.215", "D0-00-35-66-A9-54", "Greg-HP", "Grégory"));
+        ObservableList<HostToDisplay> hostsToDisplay = FXCollections.observableArrayList();//
+        HostToDisplay h;
         final ObservableList<HostToDisplay> hostsToNotDisplay = supervisedUsersList.supervisedUserObservable;
         for (Host host : hosts) {
                     for (User user : host.users) {
                         String u = "";
-                        if (user.fullname != "") {
-                            u = "Nom complet : " + user.fullname;
+                        /*if (user.fullname != "") {
+                            u = "Nom complet : " + user.fullname + "\n";
                         }
                         if (user.name != "") {
-                            u += "\nNom : " + user.name;
+                            u += "Nom : " + user.name;
+                        }*/
+                        //Nico
+                        if (user.name != "") {
+                            u = "Nom : " + user.name;
+                        }
+                        if (user.fullname != "") {
+                            u += "\nNom complet : " + user.fullname;
                         }
                         h = new HostToDisplay(host.ip, host.mac, host.name, u);
                         if(!hostsToNotDisplay.contains(h)){ // Display only not supervised hosts
                             hostsToDisplay.add(h);
                         }
                     }
-            };*/
+            };
         TableColumn usernameCol = new TableColumn("Nom d'utilisateur");
         usernameCol.setCellValueFactory(new PropertyValueFactory<HostToDisplay,String>("user"));
         TableColumn machineCol = new TableColumn("Nom de la machine");
@@ -200,7 +205,7 @@ public class discoveryUsersList implements Initializable {
                 String addr = addresses.nextElement().getHostAddress();
                 if (!nin.contains("Adapter") && !nin.contains("Virtual") && (addr.contains("160.98.") ||addr.contains("192.168.") || addr.contains("172.16.") || addr.contains("10."))) {
                     if (networkInterface.getInterfaceAddresses().size() == 1) return new NetworkInfo(addr, networkInterface.getInterfaceAddresses().get(0).getNetworkPrefixLength());
-                    else return new NetworkInfo(addr, networkInterface.getInterfaceAddresses().get(3).getNetworkPrefixLength()); //OLD  new NetworkInfo(addr, networkInterface.getInterfaceAddresses().get(1).getNetworkPrefixLength());
+                    else return new NetworkInfo(addr, networkInterface.getInterfaceAddresses().get(1).getNetworkPrefixLength()); //OLD  new NetworkInfo(addr, networkInterface.getInterfaceAddresses().get(1).getNetworkPrefixLength());
                 }
             }
         }

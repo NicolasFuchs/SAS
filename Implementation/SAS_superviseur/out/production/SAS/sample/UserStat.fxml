@@ -7,6 +7,8 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ProgressBar?>
 <?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.Slider?>
+<?import javafx.scene.control.Spinner?>
 <?import javafx.scene.control.Tab?>
 <?import javafx.scene.control.TabPane?>
 <?import javafx.scene.control.TextArea?>
@@ -18,7 +20,7 @@
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.text.Font?>
 
-<ScrollPane maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="900.0" prefWidth="1600.0" xmlns="http://javafx.com/javafx/9.0.4" xmlns:fx="http://javafx.com/fxml/1" fx:controller="sample.UserStat">
+<ScrollPane maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="900.0" prefWidth="1600.0" stylesheets="@userStatStyle.css" xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1" fx:controller="sample.UserStat">
    <content>
       <BorderPane prefHeight="900.0" prefWidth="1500.0">
           <center>
@@ -58,10 +60,18 @@
                                           <bottom>
                                               <AnchorPane prefHeight="81.0" prefWidth="1500.0" BorderPane.alignment="CENTER">
                                                   <children>
-                                                      <ProgressBar layoutX="261.0" layoutY="14.0" prefHeight="20.0" prefWidth="1200.0" progress="0.0" />
-                                                      <ProgressBar layoutX="262.0" layoutY="44.0" prefHeight="20.0" prefWidth="1200.0" progress="0.0" />
-                                                      <Label layoutX="88.0" layoutY="16.0" text="Objectif réseaux sociaux" />
-                                                      <Label layoutX="117.0" layoutY="46.0" text="Objectif jeux vidéos" />
+                                                      <ProgressBar id="socialNetworkProgressBar" fx:id="socialNetworkProgressBar" layoutX="261.0" layoutY="14.0" prefHeight="20.0" prefWidth="976.0" progress="0.0" />
+                                                      <ProgressBar id="gameProgressBar" fx:id="gameProgressBar" layoutX="262.0" layoutY="44.0" prefHeight="20.0" prefWidth="975.0" progress="0.0" />
+                                                      <Label layoutX="14.0" layoutY="16.0" text="Objectif réseaux sociaux" />
+                                                      <Label layoutX="38.0" layoutY="46.0" text="Objectif jeux vidéos" />
+                                          <Button fx:id="socialNetworkObjectiveButton" layoutX="1250.0" layoutY="12.0" mnemonicParsing="false" onAction="#activateSocialObjective" prefHeight="25.0" prefWidth="140.0" text="Activer" />
+                                          <Button fx:id="gameObjectiveButton" layoutX="1250.0" layoutY="42.0" mnemonicParsing="false" onAction="#activateGameObjective" prefHeight="25.0" prefWidth="140.0" text="Activer" />
+                                          <Spinner fx:id="socialNetworkObjective" focusTraversable="false" layoutX="157.0" layoutY="12.0" prefHeight="25.0" prefWidth="69.0" />
+                                          <Spinner fx:id="gameObjective" layoutX="158.0" layoutY="42.0" prefHeight="25.0" prefWidth="68.0" />
+                                          <Label layoutX="232.0" layoutY="16.0" text="h" />
+                                          <Label layoutX="232.0" layoutY="46.0" text="h" />
+                                          <Slider id="socialNetworkSlider" fx:id="socialNetworkSlider" layoutX="261.0" layoutY="14.0" prefHeight="21.0" prefWidth="976.0" />
+                                          <Slider id="gameSlider" fx:id="gameSlider" layoutX="261.0" layoutY="44.0" prefHeight="21.0" prefWidth="976.0" styleClass="slide" />
                                                   </children>
                                               </AnchorPane>
                                           </bottom>

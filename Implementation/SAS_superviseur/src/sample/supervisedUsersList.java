@@ -44,6 +44,13 @@ public class supervisedUsersList implements Initializable {
             if (event.getButton().equals(MouseButton.PRIMARY) && event.getClickCount() == 2){
                 hostToSend = supervisedUsersList.getSelectionModel().getSelectedItem();
                 System.out.println(hostToSend.getName());
+
+                //Nico
+                String fullUser = hostToSend.getUser();
+                String[] splittedFullUser = fullUser.split("\\n");
+                hostToSend.setUser(splittedFullUser[0].split(":")[1].substring(1));
+                //
+
                 this.stageMain = Main.stageMain;
                 Parent root = null;
                 try {
@@ -52,6 +59,7 @@ public class supervisedUsersList implements Initializable {
                     e.printStackTrace();
                 }
                 Scene scene = new Scene(root);
+                scene.getStylesheets().add("sample/userStatStyle.css"); //Nico
                 stageMain.setScene(scene);
                 stageMain.setTitle("Statistiques de l'utilisateur");
                 stageMain.centerOnScreen();
