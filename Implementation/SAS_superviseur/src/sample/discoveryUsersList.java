@@ -91,13 +91,6 @@ public class discoveryUsersList implements Initializable {
         for (Host host : hosts) {
                     for (User user : host.users) {
                         String u = "";
-                        /*if (user.fullname != "") {
-                            u = "Nom complet : " + user.fullname + "\n";
-                        }
-                        if (user.name != "") {
-                            u += "Nom : " + user.name;
-                        }*/
-                        //Nico
                         if (user.name != "") {
                             u = "Nom : " + user.name;
                         }
@@ -260,30 +253,20 @@ public class discoveryUsersList implements Initializable {
         }
         p.waitFor();
         BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
-        /*String myString = "First line\none two three four internetbox.home\nThird line\none two ThisIsMyMacAddress\none two three four Nico-HP.home (160.98.126.85)\nLast line";
-        InputStream is = new ByteArrayInputStream(Charset.forName("UTF-8").encode(myString).array());
-
-        BufferedReader reader = new BufferedReader(new InputStreamReader(is));*/
         String line = "";
-        //if(System.getProperty("os.name").equals("Mac OS X")){ // do a readline because there is an additionnal line with mac os
-            line = reader.readLine();
-        //}
+        line = reader.readLine();
         line = reader.readLine();
         String[] splittedGateway = line.split("\\s+")[4].split("\\.");
         String suffix = "." + splittedGateway[splittedGateway.length-1];
-        //System.out.println(suffix);
         List<Host> hosts = new ArrayList<Host>();
         reader.readLine();
         while ((line = reader.readLine())!= null) {
             String mac = line.split("\\s+")[2];
-            //System.out.println(mac);
             String nameAndIP = reader.readLine();
             if (nameAndIP == null) break;
             String[] splittedNameAndIP = nameAndIP.split("\\s+");
             String name = splittedNameAndIP[4].replace(suffix, "");
-            //System.out.println(name);
             String ip = splittedNameAndIP[5].substring(1, splittedNameAndIP[5].length()-1);
-            //System.out.println(ip);
             System.out.println("http://" + ip + ":" + port + "/active");
             if (URLUtils.checkURLExists("http://" + ip + ":" + port + "/active")) {
                 List<User> users = getUsers(ip);

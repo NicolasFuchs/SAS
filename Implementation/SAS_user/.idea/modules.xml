@@ -2,7 +2,12 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/SAS_user.iml" filepath="$PROJECT_DIR$/.idea/SAS_user.iml" />
+      <module fileurl="file://$PROJECT_DIR$/SAS_user.iml" filepath="$PROJECT_DIR$/SAS_user.iml" />
+      <module fileurl="file://$PROJECT_DIR$/jfreechart-1.0.19/jfreechart-1.0.19.iml" filepath="$PROJECT_DIR$/jfreechart-1.0.19/jfreechart-1.0.19.iml" />
+      <module fileurl="file://$PROJECT_DIR$/JFoenix-master/demo/src/main/main.iml" filepath="$PROJECT_DIR$/JFoenix-master/demo/src/main/main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/jcommon-1.0.23/src/main/main1.iml" filepath="$PROJECT_DIR$/jcommon-1.0.23/src/main/main1.iml" />
+      <module fileurl="file://$PROJECT_DIR$/JFoenix-master/jfoenix/src/main/main2.iml" filepath="$PROJECT_DIR$/JFoenix-master/jfoenix/src/main/main2.iml" />
+      <module fileurl="file://$PROJECT_DIR$/jcommon-1.0.23/src/test/test.iml" filepath="$PROJECT_DIR$/jcommon-1.0.23/src/test/test.iml" />
     </modules>
   </component>
 </project>

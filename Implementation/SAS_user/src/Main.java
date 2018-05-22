@@ -17,11 +17,6 @@ public class Main extends Application{
     @FXML
     public void handleButtonAction(ActionEvent actionEvent) {
         try {
-           /* fxmlLoader = new FXMLLoader(getClass().getResource("Ihm/MyStat.fxml"));
-            Parent root = (Parent) fxmlLoader.load();
-            Stage stage = new Stage();
-            stage.setScene(new Scene(root));
-            stage.show();*/
             Parent root = (Parent) fxmlLoader.load(getClass().getResource("Ihm/MyStat.fxml"));
             Stage stage = new Stage();
             stage.setScene(new Scene(root));
@@ -35,7 +30,8 @@ public class Main extends Application{
     @Override
     public void start(Stage stage) throws Exception {
         this.stageMain = stage;
-        Parent root = fxmlLoader.load(getClass().getResource("Ihm/Login.fxml"));
+        //Parent root = fxmlLoader.load(getClass().getResource("Ihm/Login.fxml"));
+        Parent root = (Parent) fxmlLoader.load(getClass().getResource("Ihm/MyStat.fxml"));
         Scene scene = new Scene(root);
         stageMain.setScene(scene);
         stageMain.setTitle("Login");

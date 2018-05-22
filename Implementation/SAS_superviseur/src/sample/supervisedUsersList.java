@@ -29,12 +29,9 @@ public class supervisedUsersList implements Initializable {
     public static final String SUPERVISEDUSERSFILE = "supervisedUsers";
     public static HostToDisplay hostToSend;
     public static ObservableList supervisedUserObservable;
-    @FXML
-    public TableView<HostToDisplay> supervisedUsersList= new TableView<>();
-    @FXML
-    private Button plusButton;
-    @FXML
-    private Button minusButton;
+    @FXML public TableView<HostToDisplay> supervisedUsersList= new TableView<>();
+    @FXML private Button plusButton;
+    @FXML private Button minusButton;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {

@@ -99,6 +99,7 @@ public class MyStat implements Initializable{
         handleSelectedToggle();
         dailyPieChart.setStartAngle(90); // NEW
         dailyPieChart.setClockwise(true); // NEW
+        displayPieChart();
     }
     @FXML
     public void handleSelectedToggle() {

@@ -17,8 +17,8 @@ public class JsonReader {
         serverConnection = new ServerConnection();
         //Récupérer son propre nom de session
         myUserName = System.getProperty("user.name");
-        userInfosPieChart = serverConnection.getUserInfo("http://192.168.178.80:3000/charts/pieChart?user="+myUserName);
-        userInfosBarChart = serverConnection.getUserInfo("http://192.168.178.80:3000/charts/barChart?user="+myUserName);
+        userInfosPieChart = serverConnection.getUserInfo("http://localhost:3000/charts/pieChart?user="+myUserName);
+        userInfosBarChart = serverConnection.getUserInfo("http://localhost:3000/charts/barChart?user="+myUserName);
     }
 
     private ArrayList<Sector> readByCategory(JSONArray category, String date, String categoryName){

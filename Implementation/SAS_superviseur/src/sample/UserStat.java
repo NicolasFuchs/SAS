@@ -34,9 +34,13 @@ public class UserStat implements Initializable {
     @FXML private Slider socialNetworkSlider;
     @FXML private Slider gameSlider;
     @FXML private ProgressBar socialNetworkProgressBar;
+    @FXML private ProgressBar socialNetworkTotalTime;
+    @FXML private ProgressBar gameTotalTime;
     @FXML private ProgressBar gameProgressBar;
     @FXML private Button socialNetworkObjectiveButton;
     @FXML private Button gameObjectiveButton;
+    @FXML private Spinner socialNetworkObjectiveSpinner;
+    @FXML private Spinner gameObjectiveSpinner;
     @FXML private Label cumuledTimeLabel;
     @FXML private PieChart dailyPieChart;
     @FXML private Label dateLabel;
@@ -45,7 +49,7 @@ public class UserStat implements Initializable {
     @FXML private CheckBox displayGamesCheckbox;
     @FXML private CheckBox displayNetworksCheckbox;
     @FXML private CheckBox displayCumulateTimeCheckbox;
-    @FXML private BorderPane tabBorderPane;
+    @FXML private BorderPane tabBorderPancategoryToggleButtone;
     @FXML private Pane centerPane;
     @FXML private ToggleButton activityToggleButton;
     @FXML private ToggleButton categoryToggleButton;
@@ -80,17 +84,43 @@ public class UserStat implements Initializable {
     public void initialize(URL location, ResourceBundle resources) {
 
         //Nico
+        socialNetworkSlider.getStyleClass().add("slider");
+        gameSlider.getStyleClass().add("slider");
+        socialNetworkProgressBar.getStyleClass().add("progressBarObjective");
+        gameProgressBar.getStyleClass().add("progressBarObjective");
+        socialNetworkTotalTime.getStyleClass().add("progressBarDone");
+        gameTotalTime.getStyleClass().add("progressBarDone");
+
         socialNetworkSlider.setMin(0);
         socialNetworkSlider.setMax(24);
         gameSlider.setMin(0);
-        gameSlider.setMax(0);
-        socialNetworkSlider.setMinWidth(socialNetworkProgressBar.getMinWidth());
-        socialNetworkSlider.setMaxWidth(socialNetworkProgressBar.getMaxWidth());
-        socialNetworkSlider.setPrefWidth(socialNetworkProgressBar.getPrefWidth());
+        gameSlider.setMax(24);
+
+        socialNetworkObjectiveSpinner.setValueFactory(new SpinnerValueFactory.DoubleSpinnerValueFactory(0,24,0, 0.5));
+        gameObjectiveSpinner.setValueFactory(new SpinnerValueFactory.DoubleSpinnerValueFactory(0,24,0, 0.5));
 
         socialNetworkSlider.valueProperty().addListener(new ChangeListener<Number>() {
             public void changed(ObservableValue<? extends Number> ov, Number old_val, Number new_val) {
                 socialNetworkProgressBar.setProgress(new_val.doubleValue()/24);
+                socialNetworkObjectiveSpinner.getValueFactory().setValue(new_val.doubleValue());
+            }
+        });
+        gameSlider.valueProperty().addListener(new ChangeListener<Number>() {
+            public void changed(ObservableValue<? extends Number> ov, Number old_val, Number new_val) {
+                gameProgressBar.setProgress(new_val.doubleValue()/24);
+                gameObjectiveSpinner.getValueFactory().setValue(new_val.doubleValue());
+            }
+        });
+        socialNetworkObjectiveSpinner.valueProperty().addListener(new ChangeListener<Number>() {
+            public void changed(ObservableValue<? extends Number> ov, Number old_val, Number new_val) {
+                socialNetworkProgressBar.setProgress(new_val.doubleValue()/24);
+                socialNetworkSlider.setValue(new_val.doubleValue());
+            }
+        });
+        gameObjectiveSpinner.valueProperty().addListener(new ChangeListener<Number>() {
+            public void changed(ObservableValue<? extends Number> ov, Number old_val, Number new_val) {
+                gameProgressBar.setProgress(new_val.doubleValue()/24);
+                gameSlider.setValue(new_val.doubleValue());
             }
         });
         //
@@ -105,7 +135,7 @@ public class UserStat implements Initializable {
         backImageView.setImage(image);
         userNoteTextArea.setEditable(false);
         userActivityLabel.setText("Activités de "+supervisedUser.getUser()); // NEW
-        CategoryAxis xAxis    = new CategoryAxis();
+        CategoryAxis xAxis = new CategoryAxis();
         NumberAxis yAxis = new NumberAxis(0,60,5);
         dailyBarChart = new BarChart(xAxis, yAxis);
         dailyBarChart.setBarGap(0.5);
@@ -172,6 +202,7 @@ public class UserStat implements Initializable {
     }
 
     private void displayCumulateTimePieChart() {
+         System.out.println("Category");
         Sector sector;
         ObservableList<PieChart.Data> pieChartData = FXCollections.observableArrayList();
        for (int i = 0; i<infosForPieChart.size();i++){
@@ -185,6 +216,7 @@ public class UserStat implements Initializable {
         pieChartData.add(new PieChart.Data("Réseaux sociaux",networkTimes)); // NEW
         pieChartData.add(new PieChart.Data("Jeux vidéos",gamesTimes)); // NEW
         setTooltip(pieChartData, 1); //NEW
+        dailyPieChart.setData(pieChartData);
     }
 
     private void setTooltip(ObservableList pieChartData, int cat){ // NEW
@@ -205,7 +237,7 @@ public class UserStat implements Initializable {
                                     new DecimalFormat("#.##").format(pourcentage);
 
                                     alert.setContentText("Temps passé sur "+data.getName()+" "+(int)time+" minutes\n"
-                                            +"Le temps passé correspond à "+pourcentage+"% du temps total qui est "+((int)(total))+" minutes");
+                                            +"Le temps passé correspond à "+(int)pourcentage+"% du temps total qui est "+((int)(total))+" minutes");
                                     alert.showAndWait();
                                 }
                             });
@@ -214,7 +246,7 @@ public class UserStat implements Initializable {
             dailyPieChart.setData(pieChartData);
             dailyPieChart.getData().stream().forEach(data -> {
                 Tooltip tooltip = new Tooltip();
-                tooltip.setText(data.getName()+" "+data.getPieValue());
+                tooltip.setText(data.getName());
                 Tooltip.install(data.getNode(), tooltip);
             });
         }
@@ -256,6 +288,7 @@ public class UserStat implements Initializable {
                 cumulateGamesTime += time;
             }
         }
+        gameTotalTime.setProgress(cumulateGamesTime/60/24);
         gamesDisplayed = true;
         dailyBarChart.getData().addAll(series1);
     }
@@ -272,6 +305,7 @@ public class UserStat implements Initializable {
                 cumulateNetworkTime += time;
                 }
         }
+        socialNetworkTotalTime.setProgress(cumulateNetworkTime/60/24);
         networkDisplayed = true;
         dailyBarChart.getData().addAll(series2);
     }
@@ -339,13 +373,63 @@ public class UserStat implements Initializable {
         }
     }
 
+    //Nico
     @FXML
     public void activateSocialObjective() {
-
+        if (socialNetworkSlider.isDisable()) {
+            socialNetworkProgressBar.setDisable(false);
+            socialNetworkSlider.setDisable(false);
+            socialNetworkObjectiveSpinner.setDisable(false);
+            socialNetworkTotalTime.setDisable(false);
+            socialNetworkObjectiveButton.setText("Désactiver");
+        } else {
+            socialNetworkProgressBar.setDisable(true);
+            socialNetworkSlider.setDisable(true);
+            socialNetworkObjectiveSpinner.setDisable(true);
+            socialNetworkTotalTime.setDisable(true);
+            socialNetworkObjectiveButton.setText("Activer");
+        }
     }
 
     @FXML
     public void activateGameObjective() {
-
+        if (gameSlider.isDisable()) {
+            gameProgressBar.setDisable(false);
+            gameSlider.setDisable(false);
+            gameObjectiveSpinner.setDisable(false);
+            gameTotalTime.setDisable(false);
+            gameObjectiveButton.setText("Désactiver");
+        } else {
+            gameProgressBar.setDisable(true);
+            gameSlider.setDisable(true);
+            gameObjectiveSpinner.setDisable(true);
+            gameTotalTime.setDisable(true);
+            gameObjectiveButton.setText("Activer");
+        }
     }
+
+    @FXML
+    public void socialNetworkShowRule() {
+        socialNetworkSlider.setShowTickLabels(true);
+        socialNetworkSlider.setShowTickMarks(true);
+    }
+
+    @FXML
+    public void gameShowRule() {
+        gameSlider.setShowTickLabels(true);
+        gameSlider.setShowTickMarks(true);
+    }
+
+    @FXML
+    public void socialNetworkHideRule() {
+        socialNetworkSlider.setShowTickLabels(false);
+        socialNetworkSlider.setShowTickMarks(false);
+    }
+
+    @FXML
+    public void gameHideRule() {
+        gameSlider.setShowTickLabels(false);
+        gameSlider.setShowTickMarks(false);
+    }
+    //
 }
